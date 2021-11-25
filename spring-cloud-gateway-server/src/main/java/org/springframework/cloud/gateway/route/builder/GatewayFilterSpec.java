@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.cloud.gateway.filter.factory.BasicAuthGatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.factory.BasicAuthenticationProperties;
 import reactor.retry.Repeat;
 import reactor.retry.Retry;
 
@@ -184,6 +186,17 @@ public class GatewayFilterSpec extends UriSpec {
 	public GatewayFilterSpec addResponseHeader(String headerName, String headerValue) {
 		return filter(getBean(AddResponseHeaderGatewayFilterFactory.class)
 				.apply(c -> c.setName(headerName).setValue(headerValue)));
+	}
+
+	/**
+	 * A filter what will relay Basic Authorization credentials to a route. It will not
+	 * authenticate requests. It will not return an HTTP 401 Unauthorized status line with
+	 * a WWW-Authenticate header for unauthenticated requests.
+	 * @return a {@link GatewayFilterSpec} that can be used to apply additional filters
+	 */
+	public GatewayFilterSpec basicAuth(String encodedCredentials) {
+		return filter(
+				getBean(BasicAuthGatewayFilterFactory.class).apply(c -> c.setEncodedCredentials(encodedCredentials)));
 	}
 
 	/**

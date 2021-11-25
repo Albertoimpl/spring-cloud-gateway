@@ -590,6 +590,57 @@ spring:
 ----
 ====
 
+=== The `BasicAuth` `GatewayFilter` Factory
+
+The `BasicAuth` `GatewayFilter` Factory relays Basic Authorization credentials to a route.
+It will not authenticate requests.
+It will not return an `HTTP 401 Unauthorized` status line with a `WWW-Authenticate` header for unauthenticated requests.
+
+To use it, you must first base64 encode the username and password.
+
+The following example configures a `BasicAuth` `GatewayFilter`:
+
+.application.yml
+====
+[source,yaml]
+----
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: basic_auth
+        uri: https://example.org
+        filters:
+        - BasicAuth=dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ=
+----
+====
+
+This adds `Authorization: Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ=` header to the request's headers for all matching requests.
+
+The following does the same thing in Java:
+
+.Application.java
+====
+[source,java]
+----
+@Bean
+public RouteLocator routes(RouteLocatorBuilder builder) {
+	String encodedCredentials = Base64Utils.encodeToString((TEST_USER + ":" + TEST_PASSWORD).getBytes());
+
+    return builder.routes()
+        .route("basic_auth", r -> r.predicate(p -> true)
+            .filters(f -> f
+                 .basicAuth(encodedCredentials))
+    .uri(uri))
+    .build();
+}
+----
+====
+
+Note: The `BasicAuth` filter will not work together with the `TokenRelay` filter as both filters use the Authorization header.
+
+====
+
 === The `DedupeResponseHeader` `GatewayFilter` Factory
 
 The DedupeResponseHeader GatewayFilter factory takes a `name` parameter and an optional `strategy` parameter. `name` can contain a space-separated list of header names.
