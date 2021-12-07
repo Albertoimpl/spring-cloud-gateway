@@ -590,6 +590,7 @@ spring:
 ----
 ====
 
+
 === The `DedupeResponseHeader` `GatewayFilter` Factory
 
 The DedupeResponseHeader GatewayFilter factory takes a `name` parameter and an optional `strategy` parameter. `name` can contain a space-separated list of header names.
