@@ -6,7 +6,7 @@ image::https://api.codacy.com/project/badge/Grade/a6885a06921e4f72a0df0b7aabd6d1
 include::intro.adoc[]
 
 == Features
-
+* Test
 * Java 8
 * Spring Framework 5
 * Spring Boot 2
