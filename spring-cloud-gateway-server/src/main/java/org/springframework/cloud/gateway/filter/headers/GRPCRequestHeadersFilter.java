@@ -19,14 +19,17 @@ package org.springframework.cloud.gateway.filter.headers;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
  * @author Alberto C. Ríos
  */
+@Component
 public class GRPCRequestHeadersFilter implements HttpHeadersFilter, Ordered {
 
 	@Override
@@ -41,6 +44,13 @@ public class GRPCRequestHeadersFilter implements HttpHeadersFilter, Ordered {
 		if (isGRPC(headers.getFirst(HttpHeaders.CONTENT_TYPE))) {
 			updated.add("te", "trailers");
 		}
+
+		if(isGRPCWeb(exchange)) {
+			// https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-WEB.md#protocol-differences-vs-grpc-over-http2
+			updated.set(HttpHeaders.CONTENT_TYPE, "application/grpc");
+			// This is not valid in HTTP/2
+			updated.remove(HttpHeaders.CONTENT_LENGTH);
+		}
 		return updated;
 	}
 
@@ -48,6 +58,10 @@ public class GRPCRequestHeadersFilter implements HttpHeadersFilter, Ordered {
 		return StringUtils.startsWithIgnoreCase(contentTypeValue, "application/grpc");
 	}
 
+	private boolean isGRPCWeb(ServerWebExchange exchange) {
+		String contentTypeValue = exchange.getRequest().getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+		return StringUtils.startsWithIgnoreCase(contentTypeValue, "application/grpc-web");
+	}
 	@Override
 	public boolean supports(Type type) {
 		return Type.REQUEST.equals(type);

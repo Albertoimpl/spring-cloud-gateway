@@ -47,6 +47,7 @@ import org.springframework.cloud.gateway.filter.factory.CacheRequestBodyGatewayF
 import org.springframework.cloud.gateway.filter.factory.DedupeResponseHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.DedupeResponseHeaderGatewayFilterFactory.Strategy;
 import org.springframework.cloud.gateway.filter.factory.FallbackHeadersGatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.factory.GrpcWebGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.JsonToGrpcGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.MapRequestHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.PrefixPathGatewayFilterFactory;
@@ -257,6 +258,13 @@ public class GatewayFilterSpec extends UriSpec {
 	public GatewayFilterSpec jsonToGRPC(String protoDescriptor, String protoFile, String service, String method) {
 		return filter(getBean(JsonToGrpcGatewayFilterFactory.class).apply(c -> c.setMethod(method)
 				.setProtoDescriptor(protoDescriptor).setProtoFile(protoFile).setService(service)));
+	}
+
+	/**
+	 * TODO desc
+	 */
+	public GatewayFilterSpec gRPCWeb() {
+		return filter(getBean(GrpcWebGatewayFilterFactory.class).apply(c -> {}));
 	}
 
 	/**

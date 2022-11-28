@@ -81,6 +81,7 @@ import org.springframework.cloud.gateway.filter.factory.AddResponseHeaderGateway
 import org.springframework.cloud.gateway.filter.factory.CacheRequestBodyGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.DedupeResponseHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.GatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.factory.GrpcWebGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.JsonToGrpcGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.MapRequestHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.PrefixPathGatewayFilterFactory;
@@ -333,6 +334,15 @@ public class GatewayAutoConfiguration {
 	public JsonToGrpcGatewayFilterFactory jsonToGRPCFilterFactory(GrpcSslConfigurer gRPCSSLContext,
 			ResourceLoader resourceLoader) {
 		return new JsonToGrpcGatewayFilterFactory(gRPCSSLContext, resourceLoader);
+	}
+
+	@Bean
+	@ConditionalOnEnabledFilter
+	@ConditionalOnProperty(name = "server.http2.enabled", matchIfMissing = true)
+	@ConditionalOnClass(name = "io.grpc.Channel")
+	public GrpcWebGatewayFilterFactory gRPCWebFilterFactory(GrpcSslConfigurer gRPCSSLContext,
+			ResourceLoader resourceLoader) {
+		return new GrpcWebGatewayFilterFactory(gRPCSSLContext, resourceLoader);
 	}
 
 	@Bean

@@ -20,6 +20,7 @@ import reactor.netty.http.server.HttpServerResponse;
 
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.AbstractServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
@@ -52,12 +53,23 @@ public class GRPCResponseHeadersFilter implements HttpHeadersFilter, Ordered {
 			}
 
 		}
+		if (isGRPCWeb(exchange)) {
+			responseHeaders.set(HttpHeaders.CONTENT_TYPE, "application/grpc");
+			response.setStatusCode(HttpStatusCode.valueOf(200));
+//			((HttResponse) ((AbstractServerHttpResponse) response).getNativeResponse())
+			////					.trailerHeaders(h -> h.set("grpc-message", ""));pServer
+		}
 		return headers;
 	}
 
 	private boolean isGRPC(ServerWebExchange exchange) {
 		String contentTypeValue = exchange.getRequest().getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
 		return StringUtils.startsWithIgnoreCase(contentTypeValue, "application/grpc");
+	}
+
+	private boolean isGRPCWeb(ServerWebExchange exchange) {
+		String contentTypeValue = exchange.getRequest().getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+		return StringUtils.startsWithIgnoreCase(contentTypeValue, "application/grpc-web");
 	}
 
 	@Override

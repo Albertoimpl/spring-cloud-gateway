@@ -48,75 +48,75 @@ public class GRPCApplication {
 		SpringApplication.run(GRPCApplication.class, args);
 	}
 
-	@Component
-	static class GRPCServer implements ApplicationRunner {
-
-		private static final Logger log = LoggerFactory.getLogger(GRPCServer.class);
-
-		private final Environment environment;
-
-		private Server server;
-
-		GRPCServer(Environment environment) {
-			this.environment = environment;
-		}
-
-		@Override
-		public void run(ApplicationArguments args) throws Exception {
-			final GRPCServer server = new GRPCServer(environment);
-			server.start();
-		}
-
-		private void start() throws IOException {
-			Integer serverPort = environment.getProperty("local.server.port", Integer.class);
-			int grpcPort = serverPort + 1;
-			/*
-			 * The port on which the server should run. We run
-			 */
-			ServerCredentials creds = createServerCredentials();
-			server = Grpc.newServerBuilderForPort(grpcPort, creds).addService(new HelloService()).build().start();
-
-			log.info("Starting gRPC server in port " + grpcPort);
-
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-				try {
-					GRPCServer.this.stop();
-				}
-				catch (InterruptedException e) {
-					e.printStackTrace(System.err);
-				}
-			}));
-		}
-
-		private ServerCredentials createServerCredentials() throws IOException {
-			File certChain = new ClassPathResource("public.cert").getFile();
-			File privateKey = new ClassPathResource("private.key").getFile();
-
-			return TlsServerCredentials.create(certChain, privateKey);
-		}
-
-		private void stop() throws InterruptedException {
-			if (server != null) {
-				server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-			}
-		}
-
-		static class HelloService extends HelloServiceGrpc.HelloServiceImplBase {
-
-			@Override
-			public void hello(HelloRequest request, StreamObserver<HelloResponse> responseObserver) {
-
-				String greeting = String.format("Hello, %s %s", request.getFirstName(), request.getLastName());
-				log.info("Sending response: " + greeting);
-
-				HelloResponse response = HelloResponse.newBuilder().setGreeting(greeting).build();
-
-				responseObserver.onNext(response);
-				responseObserver.onCompleted();
-			}
-
-		}
-
-	}
+//	@Component
+//	static class GRPCServer implements ApplicationRunner {
+//
+//		private static final Logger log = LoggerFactory.getLogger(GRPCServer.class);
+//
+//		private final Environment environment;
+//
+//		private Server server;
+//
+//		GRPCServer(Environment environment) {
+//			this.environment = environment;
+//		}
+//
+//		@Override
+//		public void run(ApplicationArguments args) throws Exception {
+//			final GRPCServer server = new GRPCServer(environment);
+//			server.start();
+//		}
+//
+//		private void start() throws IOException {
+//			Integer serverPort = environment.getProperty("local.server.port", Integer.class);
+//			int grpcPort = serverPort + 1;
+//			/*
+//			 * The port on which the server should run. We run
+//			 */
+//			ServerCredentials creds = createServerCredentials();
+//			server = Grpc.newServerBuilderForPort(grpcPort, creds).addService(new HelloService()).build().start();
+//
+//			log.info("Starting gRPC server in port " + grpcPort);
+//
+//			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//				try {
+//					GRPCServer.this.stop();
+//				}
+//				catch (InterruptedException e) {
+//					e.printStackTrace(System.err);
+//				}
+//			}));
+//		}
+//
+//		private ServerCredentials createServerCredentials() throws IOException {
+//			File certChain = new ClassPathResource("public.cert").getFile();
+//			File privateKey = new ClassPathResource("private.key").getFile();
+//
+//			return TlsServerCredentials.create(certChain, privateKey);
+//		}
+//
+//		private void stop() throws InterruptedException {
+//			if (server != null) {
+//				server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+//			}
+//		}
+//
+//		static class HelloService extends HelloServiceGrpc.HelloServiceImplBase {
+//
+//			@Override
+//			public void hello(HelloRequest request, StreamObserver<HelloResponse> responseObserver) {
+//
+//				String greeting = String.format("Hello, %s %s", request.getFirstName(), request.getLastName());
+//				log.info("Sending response: " + greeting);
+//
+//				HelloResponse response = HelloResponse.newBuilder().setGreeting(greeting).build();
+//
+//				responseObserver.onNext(response);
+//				responseObserver.onCompleted();
+//			}
+//
+//		}
+//
+//	}
 
 }

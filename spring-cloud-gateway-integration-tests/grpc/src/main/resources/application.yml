@@ -1,0 +1,59 @@
+server:
+  http2:
+    enabled: true
+  #  ssl:
+  #    key-store: classpath:keystore.p12
+  #    key-store-type: pkcs12
+  #    key-store-password: password
+  #    key-alias: bootapp
+  port: 9091
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            exposedHeaders: "*"
+      httpserver:
+        wiretap: true
+      httpclient:
+        wiretap: true
+        ssl:
+          use-insecure-trust-manager: true
+      routes:
+        - uri: http://localhost:9090
+          predicates:
+            - Path=/**
+          filters:
+            - name: GrpcWeb
+              args:
+                protoDescriptor: file:/Users/rcallejarios/workspace/oss/spring-cloud-gateway/spring-cloud-gateway-integration-tests/grpc/src/main/resources/proto/helloworld.pb
+                protoFile: file:/Users/rcallejarios/workspace/oss/spring-cloud-gateway/spring-cloud-gateway-integration-tests/grpc/src/main/resources/proto/helloworld.proto
+                service: Greeter
+                method: SayHello
+#            - name: GrpcWeb
+#              args:
+#                protoDescriptor: file:/Users/rcallejarios/workspace/oss/spring-cloud-gateway/spring-cloud-gateway-integration-tests/grpc/src/main/resources/proto/helloworld.pb
+#                protoFile: file:/Users/rcallejarios/workspace/oss/spring-cloud-gateway/spring-cloud-gateway-integration-tests/grpc/src/main/resources/proto/helloworld.proto
+#                service: Greeter
+#                method: SayRepeatHello
+
+logging:
+  level:
+    reactor.netty: DEBUG
+    org.springframework.cloud.gateway.filter: DEBUG
